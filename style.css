@@ -1,0 +1,470 @@
+/* ===========================
+   Space Planet Defender - CSS
+   =========================== */
+
+/* Import de la police spatiale */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
+/* Reset et base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --cyan: #00ffff;
+    --violet: #8800ff;
+    --orange: #ff6600;
+    --red: #ff0033;
+    --green: #00ff88;
+    --dark-bg: #000010;
+    --overlay: rgba(0, 0, 16, 0.85);
+}
+
+body {
+    background-color: var(--dark-bg);
+    color: white;
+    font-family: 'Orbitron', monospace;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===========================
+   Canvas principal
+   =========================== */
+#gameCanvas {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* ===========================
+   Écrans de jeu
+   =========================== */
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.screen.active {
+    pointer-events: all;
+}
+
+.screen-overlay {
+    background: var(--overlay);
+    backdrop-filter: blur(4px);
+}
+
+/* ===========================
+   Écran titre
+   =========================== */
+#titleScreen {
+    background: linear-gradient(180deg, rgba(0,0,32,0.95) 0%, rgba(0,0,16,0.98) 100%);
+}
+
+.title-container {
+    text-align: center;
+    animation: fadeInDown 1s ease-out;
+}
+
+.game-title {
+    font-size: clamp(2rem, 6vw, 5rem);
+    font-weight: 900;
+    color: var(--cyan);
+    text-shadow:
+        0 0 20px var(--cyan),
+        0 0 40px var(--cyan),
+        0 0 80px rgba(0, 255, 255, 0.5);
+    letter-spacing: 0.1em;
+    line-height: 1.1;
+    animation: titlePulse 2s ease-in-out infinite alternate;
+}
+
+.game-subtitle {
+    font-size: clamp(0.8rem, 2vw, 1.2rem);
+    color: var(--violet);
+    text-shadow: 0 0 10px var(--violet);
+    margin-top: 0.5rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+}
+
+.title-separator {
+    width: 300px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    margin: 2rem auto;
+    animation: scanline 3s linear infinite;
+}
+
+.high-score-display {
+    font-size: clamp(0.7rem, 1.5vw, 1rem);
+    color: var(--orange);
+    text-shadow: 0 0 10px var(--orange);
+    margin-bottom: 1rem;
+    letter-spacing: 0.2em;
+}
+
+.high-score-display span {
+    color: white;
+    font-weight: 700;
+}
+
+/* Instructions */
+.controls-info {
+    display: flex;
+    gap: 2rem;
+    margin: 1.5rem 0;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.control-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.control-key {
+    background: rgba(0, 255, 255, 0.1);
+    border: 1px solid var(--cyan);
+    border-radius: 6px;
+    padding: 0.4rem 0.8rem;
+    font-size: clamp(0.6rem, 1.2vw, 0.85rem);
+    color: var(--cyan);
+    font-family: 'Orbitron', monospace;
+    box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+}
+
+.control-desc {
+    font-size: clamp(0.5rem, 1vw, 0.7rem);
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    max-width: 100px;
+}
+
+/* ===========================
+   Boutons
+   =========================== */
+.btn {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(0.8rem, 2vw, 1.1rem);
+    font-weight: 700;
+    padding: 1rem 3rem;
+    border: 2px solid var(--cyan);
+    background: rgba(0, 255, 255, 0.1);
+    color: var(--cyan);
+    cursor: pointer;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+    position: relative;
+    overflow: hidden;
+    margin-top: 1.5rem;
+    pointer-events: all;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: -100%;
+    width: 300%;
+    height: 300%;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(0, 255, 255, 0.3) 50%,
+        transparent 70%
+    );
+    transition: all 0.5s ease;
+}
+
+.btn:hover {
+    background: rgba(0, 255, 255, 0.25);
+    box-shadow:
+        0 0 20px rgba(0, 255, 255, 0.5),
+        inset 0 0 20px rgba(0, 255, 255, 0.1);
+    transform: scale(1.05);
+}
+
+.btn:hover::before {
+    top: -50%;
+    left: -50%;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn-secondary {
+    border-color: var(--violet);
+    color: var(--violet);
+    background: rgba(136, 0, 255, 0.1);
+}
+
+.btn-secondary:hover {
+    background: rgba(136, 0, 255, 0.25);
+    box-shadow:
+        0 0 20px rgba(136, 0, 255, 0.5),
+        inset 0 0 20px rgba(136, 0, 255, 0.1);
+}
+
+/* ===========================
+   Écran pause
+   =========================== */
+#pauseScreen {
+    display: none;
+}
+
+#pauseScreen.active {
+    display: flex;
+}
+
+.pause-title {
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 900;
+    color: var(--violet);
+    text-shadow:
+        0 0 20px var(--violet),
+        0 0 40px rgba(136, 0, 255, 0.5);
+    letter-spacing: 0.3em;
+    animation: pulseFade 1.5s ease-in-out infinite alternate;
+}
+
+/* ===========================
+   Écran Game Over
+   =========================== */
+#gameOverScreen {
+    display: none;
+}
+
+#gameOverScreen.active {
+    display: flex;
+}
+
+.gameover-title {
+    font-size: clamp(2rem, 6vw, 4.5rem);
+    font-weight: 900;
+    color: var(--red);
+    text-shadow:
+        0 0 20px var(--red),
+        0 0 40px rgba(255, 0, 51, 0.5);
+    letter-spacing: 0.2em;
+    animation: shake 0.5s ease-in-out 1;
+}
+
+.score-final {
+    margin: 1.5rem 0;
+    text-align: center;
+}
+
+.score-label {
+    font-size: clamp(0.6rem, 1.5vw, 0.9rem);
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+}
+
+.score-value {
+    font-size: clamp(1.5rem, 4vw, 3rem);
+    font-weight: 700;
+    color: var(--cyan);
+    text-shadow: 0 0 15px var(--cyan);
+}
+
+.highscore-value {
+    color: var(--orange);
+    text-shadow: 0 0 15px var(--orange);
+}
+
+.new-record {
+    font-size: clamp(0.7rem, 1.5vw, 1rem);
+    color: var(--green);
+    text-shadow: 0 0 10px var(--green);
+    letter-spacing: 0.2em;
+    animation: newRecord 0.5s ease-in-out infinite alternate;
+    display: none;
+}
+
+.new-record.visible {
+    display: block;
+}
+
+.motivating-message {
+    font-size: clamp(0.6rem, 1.3vw, 0.85rem);
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 1rem;
+    letter-spacing: 0.1em;
+    font-style: italic;
+}
+
+.gameover-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* ===========================
+   HUD de jeu (affiché sur le canvas)
+   =========================== */
+#hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    pointer-events: none;
+    z-index: 5;
+    padding: 1rem;
+    display: none;
+}
+
+#hud.active {
+    display: block;
+}
+
+.hud-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.hud-left,
+.hud-right,
+.hud-center {
+    min-width: 150px;
+}
+
+.hud-center {
+    text-align: center;
+}
+
+.hud-label {
+    font-size: clamp(0.5rem, 1vw, 0.65rem);
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+}
+
+.hud-value {
+    font-size: clamp(1rem, 2.5vw, 1.8rem);
+    font-weight: 700;
+    color: var(--cyan);
+    text-shadow: 0 0 10px var(--cyan);
+}
+
+.hud-right .hud-value {
+    text-align: right;
+    color: var(--orange);
+    text-shadow: 0 0 10px var(--orange);
+}
+
+.hud-right .hud-label {
+    text-align: right;
+}
+
+.hud-center .hud-value {
+    color: var(--violet);
+    text-shadow: 0 0 10px var(--violet);
+}
+
+.lives-display {
+    margin-top: 0.3rem;
+    font-size: clamp(1rem, 2vw, 1.5rem);
+    letter-spacing: 0.1em;
+}
+
+/* ===========================
+   Animations
+   =========================== */
+@keyframes titlePulse {
+    0% {
+        text-shadow: 0 0 20px var(--cyan), 0 0 40px var(--cyan), 0 0 80px rgba(0, 255, 255, 0.3);
+    }
+    100% {
+        text-shadow: 0 0 30px var(--cyan), 0 0 60px var(--cyan), 0 0 120px rgba(0, 255, 255, 0.7);
+    }
+}
+
+@keyframes pulseFade {
+    0% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scanline {
+    0% { background-position: -300px 0; }
+    100% { background-position: 300px 0; }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-8px); }
+    80% { transform: translateX(8px); }
+}
+
+@keyframes newRecord {
+    0% { transform: scale(1); text-shadow: 0 0 10px var(--green); }
+    100% { transform: scale(1.1); text-shadow: 0 0 25px var(--green); }
+}
+
+/* ===========================
+   Responsive
+   =========================== */
+@media (max-width: 600px) {
+    .controls-info {
+        gap: 1rem;
+    }
+
+    .btn {
+        padding: 0.8rem 2rem;
+    }
+
+    .gameover-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+/* Afficher les contrôles mobiles uniquement sur les appareils tactiles */
+.mobile-controls-info {
+    display: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .mobile-controls-info {
+        display: flex;
+    }
+}

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Space Planet Defender</title>
+    <meta name="description" content="Défendez votre planète contre les astéroïdes ! Un jeu spatial en HTML5/Canvas.">
+
+    <!-- Police spatiale -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Canvas principal -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- ===========================
+         HUD (affiché pendant le jeu)
+         =========================== -->
+    <div id="hud">
+        <div class="hud-top">
+            <!-- Coin haut gauche : Score + Vies -->
+            <div class="hud-left">
+                <div class="hud-label">SCORE</div>
+                <div class="hud-value" id="score">0</div>
+                <div class="lives-display" id="lives">❤️❤️❤️</div>
+            </div>
+
+            <!-- Centre : Vague -->
+            <div class="hud-center">
+                <div class="hud-label">VAGUE</div>
+                <div class="hud-value" id="wave">1</div>
+            </div>
+
+            <!-- Coin haut droit : High Score -->
+            <div class="hud-right">
+                <div class="hud-label">MEILLEUR SCORE</div>
+                <div class="hud-value" id="highScore">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===========================
+         Écran Titre
+         =========================== -->
+    <div id="titleScreen" class="screen active">
+        <div class="title-container">
+            <h1 class="game-title">SPACE PLANET<br>DEFENDER</h1>
+            <p class="game-subtitle">⚔️ Défends ta planète contre les astéroïdes ⚔️</p>
+
+            <div class="title-separator"></div>
+
+            <div class="high-score-display">
+                MEILLEUR SCORE : <span id="titleHighScore">0</span>
+            </div>
+
+            <!-- Instructions -->
+            <div class="controls-info">
+                <div class="control-item">
+                    <div class="control-key">← → / A D</div>
+                    <div class="control-desc">Orbiter autour de la planète</div>
+                </div>
+                <div class="control-item">
+                    <div class="control-key">ESPACE / CLIC</div>
+                    <div class="control-desc">Tirer un projectile</div>
+                </div>
+                <div class="control-item">
+                    <div class="control-key">P</div>
+                    <div class="control-desc">Pause</div>
+                </div>
+            </div>
+
+            <div class="controls-info mobile-controls-info">
+                <div class="control-item">
+                    <div class="control-key">📱 GAUCHE</div>
+                    <div class="control-desc">Toucher la zone gauche de l'écran</div>
+                </div>
+                <div class="control-item">
+                    <div class="control-key">📱 CENTRE</div>
+                    <div class="control-desc">Toucher le centre pour tirer</div>
+                </div>
+                <div class="control-item">
+                    <div class="control-key">📱 DROITE</div>
+                    <div class="control-desc">Toucher la zone droite de l'écran</div>
+                </div>
+            </div>
+
+            <button id="playBtn" class="btn">🚀 JOUER</button>
+        </div>
+    </div>
+
+    <!-- ===========================
+         Écran Pause
+         =========================== -->
+    <div id="pauseScreen" class="screen screen-overlay">
+        <div class="pause-title">⏸ PAUSE</div>
+        <button id="resumeBtn" class="btn btn-secondary">▶ REPRENDRE</button>
+    </div>
+
+    <!-- ===========================
+         Écran Game Over
+         =========================== -->
+    <div id="gameOverScreen" class="screen screen-overlay">
+        <div class="gameover-title">💥 GAME OVER</div>
+
+        <div class="score-final">
+            <div class="score-label">TON SCORE</div>
+            <div class="score-value" id="finalScore">0</div>
+
+            <div class="new-record" id="newRecord">🏆 NOUVEAU RECORD ! 🏆</div>
+
+            <div class="score-label" style="margin-top: 1rem;">MEILLEUR SCORE</div>
+            <div class="score-value highscore-value" id="highScoreGO">0</div>
+        </div>
+
+        <p class="motivating-message" id="motivatingMsg">La planète a besoin de toi !</p>
+
+        <div class="gameover-buttons">
+            <button id="replayBtn" class="btn">🔄 REJOUER</button>
+            <button id="menuBtn" class="btn btn-secondary">🏠 MENU</button>
+        </div>
+    </div>
+
+    <!-- Logique du jeu -->
+    <script src="game.js"></script>
+</body>
+</html>
