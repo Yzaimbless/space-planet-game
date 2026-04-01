@@ -358,12 +358,102 @@ canvas.addEventListener('mousedown', (e) => {
     }
 });
 
+// ===========================
+// Contrôles tactiles mobiles
+// ===========================
+let touchState = {
+    active: false,
+    startX: 0,
+    startY: 0,
+    currentX: 0,
+    currentY: 0,
+    isSwiping: false,
+    fireZone: false,   // true si le toucher est dans la zone de tir (centre)
+};
+
+/**
+ * Détecte si l'appareil est tactile (mobile/tablette)
+ */
+function isTouchDevice() {
+    return ('ontouchstart' in window) ||
+        (navigator.maxTouchPoints > 0) ||
+        (navigator.msMaxTouchPoints > 0);
+}
+
+/**
+ * Gère le début d'un toucher.
+ * - Toucher dans le tiers gauche → orbiter à gauche
+ * - Toucher dans le tiers droit → orbiter à droite
+ * - Toucher dans le tiers central → tirer
+ */
 canvas.addEventListener('touchstart', (e) => {
     e.preventDefault();
-    if (state.gameRunning && !state.gamePaused) {
+    if (!state.gameRunning || state.gamePaused) return;
+
+    const touch = e.touches[0];
+    const screenThird = canvas.width / 3;
+
+    touchState.active = true;
+    touchState.startX = touch.clientX;
+    touchState.startY = touch.clientY;
+    touchState.currentX = touch.clientX;
+    touchState.currentY = touch.clientY;
+
+    if (touch.clientX < screenThird) {
+        // Zone gauche → orbiter à gauche
+        keys['_touchLeft'] = true;
+        keys['_touchRight'] = false;
+        touchState.fireZone = false;
+    } else if (touch.clientX > screenThird * 2) {
+        // Zone droite → orbiter à droite
+        keys['_touchRight'] = true;
+        keys['_touchLeft'] = false;
+        touchState.fireZone = false;
+    } else {
+        // Zone centrale → tirer
+        touchState.fireZone = true;
+        keys['_touchLeft'] = false;
+        keys['_touchRight'] = false;
         fireBullet();
     }
 }, { passive: false });
+
+canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    if (!touchState.active) return;
+
+    const touch = e.touches[0];
+    touchState.currentX = touch.clientX;
+    touchState.currentY = touch.clientY;
+
+    const screenThird = canvas.width / 3;
+
+    if (touch.clientX < screenThird) {
+        keys['_touchLeft'] = true;
+        keys['_touchRight'] = false;
+    } else if (touch.clientX > screenThird * 2) {
+        keys['_touchRight'] = true;
+        keys['_touchLeft'] = false;
+    } else {
+        keys['_touchLeft'] = false;
+        keys['_touchRight'] = false;
+    }
+}, { passive: false });
+
+canvas.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    touchState.active = false;
+    touchState.fireZone = false;
+    keys['_touchLeft'] = false;
+    keys['_touchRight'] = false;
+}, { passive: false });
+
+canvas.addEventListener('touchcancel', (e) => {
+    touchState.active = false;
+    touchState.fireZone = false;
+    keys['_touchLeft'] = false;
+    keys['_touchRight'] = false;
+});
 
 // ===========================
 // Mise à jour du vaisseau
@@ -371,12 +461,12 @@ canvas.addEventListener('touchstart', (e) => {
 function updateShip(dt) {
     // Détermination de la direction
     let rotating = false;
-    if (keys['ArrowLeft'] || keys['KeyA']) {
+    if (keys['ArrowLeft'] || keys['KeyA'] || keys['_touchLeft']) {
         ship.angle -= CONFIG.SHIP_SPEED * dt;
         ship.rotationDir = -1;
         rotating = true;
     }
-    if (keys['ArrowRight'] || keys['KeyD']) {
+    if (keys['ArrowRight'] || keys['KeyD'] || keys['_touchRight']) {
         ship.angle += CONFIG.SHIP_SPEED * dt;
         ship.rotationDir = 1;
         rotating = true;
@@ -1125,3 +1215,47 @@ window.addEventListener('resize', () => {
 
 // Démarrage
 init();
+
+// ===========================
+// Exports pour les tests
+// ===========================
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        CONFIG,
+        state,
+        keys,
+        circleCollision,
+        createAsteroid,
+        createExplosion,
+        createFloatingText,
+        fireBullet,
+        initShip,
+        updateShip,
+        updateBullets,
+        updateAsteroids,
+        updateParticles,
+        updateFloatingTexts,
+        updateScoreDisplay,
+        updateLivesDisplay,
+        resizeCanvas,
+        generateStars,
+        startGame,
+        togglePause,
+        triggerGameOver,
+        completeWave,
+        isTouchDevice,
+        touchState,
+        getShip: () => ship,
+        setShip: (s) => { ship = s; },
+        getBullets: () => bullets,
+        setBullets: (b) => { bullets = b; },
+        getAsteroids: () => asteroids,
+        setAsteroids: (a) => { asteroids = a; },
+        getParticles: () => particles,
+        setParticles: (p) => { particles = p; },
+        getFloatingTexts: () => floatingTexts,
+        setFloatingTexts: (f) => { floatingTexts = f; },
+        getStars: () => stars,
+        getNebulae: () => nebulae,
+    };
+}
