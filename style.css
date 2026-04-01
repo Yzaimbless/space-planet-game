@@ -457,3 +457,14 @@ body {
         align-items: center;
     }
 }
+
+/* Afficher les contrôles mobiles uniquement sur les appareils tactiles */
+.mobile-controls-info {
+    display: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .mobile-controls-info {
+        display: flex;
+    }
+}
