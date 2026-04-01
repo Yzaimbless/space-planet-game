@@ -104,6 +104,26 @@ let stars = [];
 let nebulae = [];
 
 // ===========================
+// Utilitaire : Hex vers RGBA
+// ===========================
+function hexToRgba(hex, alpha) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+// ===========================
+// Vérification de fin de vague
+// ===========================
+function checkWaveComplete() {
+    if (state.asteroidsDestroyedInWave >= state.asteroidsSpawnedInWave &&
+        state.asteroidsSpawnedInWave >= state.asteroidsInWave) {
+        completeWave();
+    }
+}
+
+// ===========================
 // Redimensionnement du canvas
 // ===========================
 function resizeCanvas() {
@@ -116,10 +136,13 @@ function resizeCanvas() {
     CONFIG.SHIP_ORBIT_RADIUS = CONFIG.PLANET_RADIUS + minDim * 0.065;
     CONFIG.PLANET_ORBIT_RADIUS = CONFIG.SHIP_ORBIT_RADIUS;
 
-    // Régénération des étoiles si nécessaire
-    if (stars.length === 0) {
-        generateStars();
+    // Mise à jour du rayon d'orbite du vaisseau si déjà initialisé
+    if (ship && ship.orbitRadius !== undefined) {
+        ship.orbitRadius = CONFIG.SHIP_ORBIT_RADIUS;
     }
+
+    // Régénération des étoiles pour couvrir la nouvelle taille
+    generateStars();
 }
 
 // ===========================
@@ -170,6 +193,9 @@ function initShip() {
         thrustIntensity: 0,   // Pour l'animation de la flamme
     };
 }
+
+// Initialisation immédiate du vaisseau pour éviter les NaN avant le premier startGame
+initShip();
 
 // ===========================
 // Création d'un astéroïde
@@ -457,11 +483,24 @@ function updateAsteroids() {
             asteroids.splice(i, 1);
             state.lives--;
             state.planetDamageFlash = 30;
+            state.asteroidsDestroyedInWave++;
             updateLivesDisplay();
 
             if (state.lives <= 0) {
                 triggerGameOver();
+            } else {
+                checkWaveComplete();
             }
+            continue;
+        }
+
+        // Nettoyage des astéroïdes hors écran (Bug 2 fix)
+        const margin = Math.max(canvas.width, canvas.height) * 0.5;
+        if (a.x < -margin || a.x > canvas.width + margin ||
+            a.y < -margin || a.y > canvas.height + margin) {
+            asteroids.splice(i, 1);
+            state.asteroidsDestroyedInWave++;
+            checkWaveComplete();
             continue;
         }
 
@@ -484,10 +523,7 @@ function updateAsteroids() {
                     state.asteroidsDestroyedInWave++;
 
                     // Vérification si la vague est terminée
-                    if (state.asteroidsDestroyedInWave >= state.asteroidsSpawnedInWave &&
-                        state.asteroidsSpawnedInWave >= state.asteroidsInWave) {
-                        completeWave();
-                    }
+                    checkWaveComplete();
                     break;
                 }
             }
@@ -795,7 +831,7 @@ function drawBullets() {
             for (let i = 1; i < b.trail.length; i++) {
                 ctx.lineTo(b.trail[i].x, b.trail[i].y);
             }
-            ctx.strokeStyle = b.color.replace(')', ', 0.3)').replace('rgb', 'rgba');
+            ctx.strokeStyle = hexToRgba(b.color, 0.3);
             ctx.lineWidth = b.radius * 1.5;
             ctx.lineCap = 'round';
             ctx.stroke();
@@ -1094,6 +1130,13 @@ document.getElementById('menuBtn').addEventListener('click', () => {
     gameOverScreen.classList.remove('active');
     hud.classList.remove('active');
     titleScreen.classList.add('active');
+
+    // Nettoyage des objets de jeu pour ne pas les voir à travers l'écran titre
+    bullets = [];
+    asteroids = [];
+    particles = [];
+    floatingTexts = [];
+
     // Mise à jour du high score sur l'écran titre
     document.getElementById('titleHighScore').textContent = state.highScore;
 });
@@ -1107,9 +1150,8 @@ function init() {
     document.getElementById('titleHighScore').textContent = state.highScore;
     highScoreDisplay.textContent = state.highScore;
 
-    // Redimensionnement initial
+    // Redimensionnement initial (génère aussi les étoiles)
     resizeCanvas();
-    generateStars();
 
     // Afficher l'écran titre
     titleScreen.classList.add('active');
